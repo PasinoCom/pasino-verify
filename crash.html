@@ -75,12 +75,12 @@
 
     <ul>
         <li>We start by generating 10 M hashes, starting with a server seed which is continuously hashed with SHA-256 till we have 10M hashes.</li>
-        <li>The last hash of the series is <code>efa3ced7a48a9c4e0740918c1cc7048d8220683e0b826fa853e733e3e09241b5</code>. This is so that you know that we have not changed the chain of our hashes in our favour. By making it public, we prevent ourselves from changing any hashes in the chain.</li>
+        <li>The last hash of the series is <code>96bd217bd55f07aba2980b59210eaa27a9b302e17617092be7fea3e232132f41</code>. This is so that you know that we have not changed the chain of our hashes in our favour. By making it public, we prevent ourselves from changing any hashes in the chain.</li>
         <li>We will play all the hashes in reverse order. Starting from 10M (th) hash to 1st.</li>
-        <li>In order to make sure that we don't choose a server seed in our favour, we use a client seed which comes from a Bitcoin block (635017) from the future. The block number is chosen before it is mined, so we don't have any way to predict its hash. Every 4-5 years (roughly), our hashes will exhaust and we will have another seeding event to generate the new list of hashes and select a new Bitcoin block in the future.</li>
+        <li>In order to make sure that we don't choose a server seed in our favour, we use a client seed which comes from a Bitcoin block (678978) from the future. The block number is chosen before it is mined, so we don't have any way to predict its hash. Every 4-5 years (roughly), our hashes will exhaust and we will have another seeding event to generate the new list of hashes and select a new Bitcoin block in the future.</li>
     </ul>
 
-    The Bitcoin Block is chosen and referenced at a third-party forum such as Bitcoin Talk. The link to our seeding event is as follows: <a href="https://bitcointalk.org/index.php?topic=5255740" target="_blank">https://bitcointalk.org/index.php?topic=5255740</a>
+    The Bitcoin Block is chosen and referenced at a third-party forum such as Bitcoin Talk. The link to our seeding event is as follows: <a href="https://bitcointalk.org/index.php?topic=5330085" target="_blank">https://bitcointalk.org/index.php?topic=5330085</a>
 
     <br>
     <br>
@@ -95,7 +95,7 @@
         <div class="col-xs-12 col-md-6">
             <div class="form-group">
                 <label for="client_seed" class="col-form-label">Client Seed (Bitcoin Block)</label>
-                <input type="text" id="client_seed" class="form-control" value="0000000000000000001221b64a1e49b293a743ff06f662ea713ca564d5e20b1e" disabled>
+                <input type="text" id="client_seed" class="form-control" value="0000000000000000000aa2dfb666783e6f5e100eefab4cd8756a359e7c247d1e" disabled>
                 <small class="form-text text-muted">This Client Seed comes from a Bitcoin Block</small>
             </div>
         </div>
