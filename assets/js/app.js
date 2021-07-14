@@ -539,9 +539,46 @@ function calculatePlinkoResult() {
         position = +position + +split_numbers[i];
     }
 
-    console.log(position);
-
     $("#result").val(plinko_payouts[rows][risk][position]);
+    $("#server_seed_hash").val(server_seed_hash);
+
+}
+
+function calculateLimboResult() {
+
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+    var nonce = $("#nonce").val();
+
+    var seeds = [];
+    var split_numbers = [];
+    var position = 0;
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    var hash_series = forge.hmac.create();
+    hash_series.start('sha256', server_seed);
+    hash_series.update(client_seed + ":" + nonce);
+    hash_series = hash_series.digest().toHex();
+
+    let s = 0;
+
+    for (x = 0; x < 32; x++) {
+        s = x * 2;
+        seeds.push(hash_series.substring(x * 2, s + 2));
+    }
+
+    let num1 = parseFloat(parseInt(seeds[0], 16) / Math.pow(256, 1)).toFixed(12);
+    let num2 = parseFloat(parseInt(seeds[1], 16) / Math.pow(256, 2)).toFixed(12);
+    let num3 = parseFloat(parseInt(seeds[2], 16) / Math.pow(256, 3)).toFixed(12);
+    let num4 = parseFloat(parseInt(seeds[3], 16) / Math.pow(256, 4)).toFixed(12);
+
+    let roll_number = toFixed((+num1 + +num2 + +num3 + +num4) * 1000000, 0);
+    let payout = toFixed(((1000000 / (+roll_number + 1) * 0.97)) / 1, 2);
+
+    $("#result").val(payout);
     $("#server_seed_hash").val(server_seed_hash);
 
 }
@@ -596,4 +633,8 @@ $("#plinko-calculate-result").click(function (e) {
 
 $("#crash-calculate-result").click(function (e) {
     calculateCrashResult();
+});
+
+$("#limbo-calculate-result").click(function (e) {
+    calculateLimboResult();
 });
