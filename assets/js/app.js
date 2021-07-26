@@ -623,6 +623,95 @@ function calculateCrashResult() {
 
 }
 
+function calculateVideoPokerResult() {
+
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+    var nonce = $("#nonce").val();
+
+    var seeds = [];
+    var roll_numbers = [];
+    var position = 0;
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    let s = 0;
+
+    for (n = 0; n < 8; n++) {
+
+        var hash_series = forge.hmac.create();
+        hash_series.start('sha256', server_seed);
+        hash_series.update(client_seed + ":" + nonce + ":" + n);
+        hash_series = hash_series.digest().toHex();
+
+        for (x = 0; x < 32; x++) {
+            s = x * 2;
+            seeds.push(hash_series.substring(x * 2, s + 2));
+        }
+
+    }
+
+    for (x = 52; x > 0; x--) {
+
+        let num1 = parseFloat(parseInt(seeds[position + 0], 16) / Math.pow(256, 1)).toFixed(12);
+        let num2 = parseFloat(parseInt(seeds[position + 1], 16) / Math.pow(256, 2)).toFixed(12);
+        let num3 = parseFloat(parseInt(seeds[position + 2], 16) / Math.pow(256, 3)).toFixed(12);
+        let num4 = parseFloat(parseInt(seeds[position + 3], 16) / Math.pow(256, 4)).toFixed(12);
+        let sum = toFixed((+num1 + +num2 + +num3 + +num4), 12);
+        let roll_number = toFixed(sum * x, 0);
+
+        position += 4;
+
+        roll_numbers.push(roll_number);
+
+    }
+
+    console.log(roll_numbers)
+
+    let deck = Array.from(Array(51).keys());
+    let initial_cards = [];
+    let coming_cards = [];
+
+    roll_numbers.every((i) => {
+
+        let card_id = deck[i];
+
+        if (initial_cards.length < 5) {
+            initial_cards.push(card_id);
+        } else if (coming_cards.length < 5) {
+            coming_cards.push(card_id);
+        } else {
+            return false;
+        }
+
+        deck.splice(i, 1);
+
+        return true;
+
+    });
+
+    let content = '';
+
+    initial_cards.forEach((i) => {
+        content += '<img src="assets/img/cards/' + i + '.png" style="width: 13%;"> &nbsp;';
+    });
+
+    $("#ic").html(content);
+
+    content = '';
+
+    coming_cards.forEach((i) => {
+        content += '<img src="assets/img/cards/' + i + '.png" style="width: 13%;"> &nbsp;';
+    });
+
+    $("#cc").html(content);
+
+    $("#server_seed_hash").val(server_seed_hash);
+
+}
+
 $("#dice-calculate-result").click(function (e) {
     calculateDiceResult();
 });
@@ -637,4 +726,8 @@ $("#crash-calculate-result").click(function (e) {
 
 $("#limbo-calculate-result").click(function (e) {
     calculateLimboResult();
+});
+
+$("#video-poker-calculate-result").click(function (e) {
+    calculateVideoPokerResult();
 });
