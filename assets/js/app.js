@@ -576,7 +576,7 @@ function calculateLimboResult() {
     let num4 = parseFloat(parseInt(seeds[3], 16) / Math.pow(256, 4)).toFixed(12);
 
     let roll_number = toFixed((+num1 + +num2 + +num3 + +num4) * 1000000, 0);
-    let payout = toFixed(((1000000 / (+roll_number + 1) * 0.97)) / 1, 2);
+    let payout = toFixed(((1000000 / (+roll_number + 1) * 0.96)) / 1, 2);
 
     $("#result").val(payout);
     $("#server_seed_hash").val(server_seed_hash);
