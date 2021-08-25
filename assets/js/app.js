@@ -583,6 +583,59 @@ function calculateLimboResult() {
 
 }
 
+function calculateDiamondsResult() {
+
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+    var nonce = $("#nonce").val();
+
+    var seeds = [];
+    var split_numbers = [];
+    var position = 0;
+    var outcome = "";
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    var hash_series = forge.hmac.create();
+    hash_series.start('sha256', server_seed);
+    hash_series.update(client_seed + ":" + nonce);
+    hash_series = hash_series.digest().toHex();
+
+    let s = 0;
+
+    for (x = 0; x < 32; x++) {
+        s = x * 2;
+        seeds.push(hash_series.substring(x * 2, s + 2));
+    }
+
+    for (x = 0; x < 20; x++) {
+
+        let s = x * 4;
+
+        let num1 = parseFloat(parseInt(seeds[s], 16) / Math.pow(256, 1)).toFixed(12);
+        let num2 = parseFloat(parseInt(seeds[s + 1], 16) / Math.pow(256, 2)).toFixed(12);
+        let num3 = parseFloat(parseInt(seeds[s + 2], 16) / Math.pow(256, 3)).toFixed(12);
+        let num4 = parseFloat(parseInt(seeds[s + 3], 16) / Math.pow(256, 4)).toFixed(12);
+
+        let sum = Math.floor((+num1 + +num2 + +num3 + +num4) * 7);
+
+        split_numbers.push(sum);
+
+    }
+
+    split_numbers = split_numbers.slice(0, 5);
+
+    split_numbers.forEach((i) => {
+        outcome += '<img src="assets/img/diamonds/' + i + '.svg" style="width: 13%;"> &nbsp;';
+    });
+
+    $("#ao").html(outcome);
+    $("#server_seed_hash").val(server_seed_hash);
+
+}
+
 function toFixed(num, fixed) {
     var re = new RegExp("^-?\\d+(?:\.\\d{0," + (fixed || -1) + "})?");
     return num.toString().match(re)[0];
@@ -620,6 +673,44 @@ function calculateCrashResult() {
         last_seed = md.digest().toHex();
 
     }
+
+}
+
+function calculateRouletteResult() {
+
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+    var nonce = $("#nonce").val();
+
+    var seeds = [];
+    var split_numbers = [];
+    var position = 0;
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    var hash_series = forge.hmac.create();
+    hash_series.start('sha256', server_seed);
+    hash_series.update(client_seed + ":" + nonce);
+    hash_series = hash_series.digest().toHex();
+
+    let s = 0;
+
+    for (x = 0; x < 32; x++) {
+        s = x * 2;
+        seeds.push(hash_series.substring(x * 2, s + 2));
+    }
+
+    let num1 = parseFloat(parseInt(seeds[0], 16) / Math.pow(256, 1)).toFixed(12);
+    let num2 = parseFloat(parseInt(seeds[1], 16) / Math.pow(256, 2)).toFixed(12);
+    let num3 = parseFloat(parseInt(seeds[2], 16) / Math.pow(256, 3)).toFixed(12);
+    let num4 = parseFloat(parseInt(seeds[3], 16) / Math.pow(256, 4)).toFixed(12);
+
+    let roll_number = toFixed((+num1 + +num2 + +num3 + +num4) * 37, 0);
+
+    $("#result").val(roll_number);
+    $("#server_seed_hash").val(server_seed_hash);
 
 }
 
@@ -667,8 +758,6 @@ function calculateVideoPokerResult() {
         roll_numbers.push(roll_number);
 
     }
-
-    console.log(roll_numbers)
 
     let deck = Array.from(Array(51).keys());
     let initial_cards = [];
@@ -730,4 +819,12 @@ $("#limbo-calculate-result").click(function (e) {
 
 $("#video-poker-calculate-result").click(function (e) {
     calculateVideoPokerResult();
+});
+
+$("#diamonds-calculate-result").click(function (e) {
+    calculateDiamondsResult();
+});
+
+$("#roulette-calculate-result").click(function (e) {
+    calculateRouletteResult();
 });
