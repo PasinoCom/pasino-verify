@@ -801,6 +801,164 @@ function calculateVideoPokerResult() {
 
 }
 
+function calculateBlackjackResult() {
+
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+    var nonce = $("#nonce").val();
+
+    var seeds = [];
+    var roll_numbers = [];
+    var position = 0;
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    let s = 0;
+
+    for (n = 0; n < 7; n++) {
+
+        var hash_series = forge.hmac.create();
+        hash_series.start('sha256', server_seed);
+        hash_series.update(client_seed + ":" + nonce + ":" + n);
+        hash_series = hash_series.digest().toHex();
+
+        for (x = 0; x < 32; x++) {
+            s = x * 2;
+            seeds.push(hash_series.substring(x * 2, s + 2));
+        }
+
+    }
+
+    for (x = 52; x > 0; x--) {
+
+        let num1 = parseFloat(parseInt(seeds[position + 0], 16) / Math.pow(256, 1)).toFixed(12);
+        let num2 = parseFloat(parseInt(seeds[position + 1], 16) / Math.pow(256, 2)).toFixed(12);
+        let num3 = parseFloat(parseInt(seeds[position + 2], 16) / Math.pow(256, 3)).toFixed(12);
+        let num4 = parseFloat(parseInt(seeds[position + 3], 16) / Math.pow(256, 4)).toFixed(12);
+        let sum = toFixed((+num1 + +num2 + +num3 + +num4), 12);
+        let roll_number = toFixed(sum * x, 0);
+
+        position += 4;
+
+        roll_numbers.push(roll_number);
+
+    }
+
+    console.log(roll_numbers);
+
+    let deck = Array.from(Array(51).keys());
+
+    let player_hand = [];
+    let dealer_hand = [];
+    let all_cards = [];
+
+    let content = '';
+
+    content += '<img src="assets/img/cards/' + deck[roll_numbers[0]] + '.png" style="width: 13%;"> &nbsp;';
+    deck.splice(deck[roll_numbers[0]], 1);
+    content += '<img src="assets/img/cards/' + deck[roll_numbers[2]] + '.png" style="width: 13%;"> &nbsp;';
+    deck.splice(deck[roll_numbers[2]], 1);
+
+    $("#player_cards").html(content);
+
+    content = '';
+
+    content += '<img src="assets/img/cards/' + deck[roll_numbers[1]] + '.png" style="width: 13%;"> &nbsp;';
+    deck.splice(deck[roll_numbers[1]], 1);
+    content += '<img src="assets/img/cards/' + deck[roll_numbers[3]] + '.png" style="width: 13%;"> &nbsp;';
+    deck.splice(deck[roll_numbers[3]], 1);
+
+    $("#dealer_cards").html(content);
+
+    for (x = 4; x < 52; x++) {
+
+        let card_id = deck[roll_numbers[x]];
+
+        all_cards.push(card_id);
+        deck.splice(card_id, 1);
+
+    }
+
+    content = '';
+
+    all_cards.forEach((i, g) => {
+        content += '<img src="assets/img/cards/' + i + '.png" style="width: 8%;"> &nbsp;';
+    });
+
+    $("#coming_cards").html(content);
+    $("#server_seed_hash").val(server_seed_hash);
+
+}
+
+function calculateKenoResult() {
+
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+    var nonce = $("#nonce").val();
+
+    var result = [];
+    var seeds = [];
+    var split_numbers = [];
+    var deck = Array.from({length: 40}, (_, i) => i + 1);
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    var series_1 = forge.hmac.create();
+    series_1.start('sha256', server_seed);
+    series_1.update(client_seed + ":" + nonce + ":0");
+    series_1 = series_1.digest().toHex();
+
+    var series_2 = forge.hmac.create();
+    series_2.start('sha256', server_seed);
+    series_2.update(client_seed + ":" + nonce + ":1");
+    series_2 = series_2.digest().toHex();
+
+    let s = 0;
+
+    for (x = 0; x < 32; x++) {
+        s = x * 2;
+        seeds.push(series_1.substring(x * 2, s + 2));
+    }
+
+    for (x = 0; x < 32; x++) {
+        s = x * 2;
+        seeds.push(series_2.substring(x * 2, s + 2));
+    }
+
+    for (x = 0; x < 10; x++) {
+
+        let s = x * 4;
+        let p = 40 - x;
+
+        let num1 = parseFloat(parseInt(seeds[s], 16) / Math.pow(256, 1)).toFixed(12);
+        let num2 = parseFloat(parseInt(seeds[s + 1], 16) / Math.pow(256, 2)).toFixed(12);
+        let num3 = parseFloat(parseInt(seeds[s + 2], 16) / Math.pow(256, 3)).toFixed(12);
+        let num4 = parseFloat(parseInt(seeds[s + 3], 16) / Math.pow(256, 4)).toFixed(12);
+
+        let sum = Math.floor((+num1 + +num2 + +num3 + +num4) * p);
+
+        split_numbers.push(sum);
+
+    }
+
+    for (i = 0; i < split_numbers.length; i++) {
+
+        let number = deck[split_numbers[i]];
+
+        result.push(number);
+        deck.splice(split_numbers[i], 1);
+
+    }
+
+    $("#result").val(result.join(", "));
+    $("#server_seed_hash").val(server_seed_hash);
+
+}
+
 $("#dice-calculate-result").click(function (e) {
     calculateDiceResult();
 });
@@ -827,4 +985,12 @@ $("#diamonds-calculate-result").click(function (e) {
 
 $("#roulette-calculate-result").click(function (e) {
     calculateRouletteResult();
+});
+
+$("#keno-calculate-result").click(function (e) {
+    calculateKenoResult();
+});
+
+$("#blackjack-calculate-result").click(function (e) {
+    calculateBlackjackResult();
 });
