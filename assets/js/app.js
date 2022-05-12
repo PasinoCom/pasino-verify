@@ -1,3 +1,5 @@
+var wheel_outcomes = ["1X", "6X", "1X", "12X", "1X", "3X", "1X", "6X", "1X", "3X", "1X", "52XA", "1X", "3X", "1X", "6X", "3X", "1X", "12X", "1X", "6X", "1X", "3X", "1X", "25X", "1X", "3X", "1X", "6X", "1X", "3X", "1X", "12X", "1X", "6X", "1X", "3X", "1X", "52XB", "3X", "1X", "3X", "1X", "3X", "1X", "12X", "1X", "6X", "1X", "3X", "1X", "25X", "1X", "3X"];
+
 var plinko_payouts = {
     "8": {
         "low": [
@@ -674,6 +676,42 @@ function calculateCrashResult() {
 
 }
 
+function calculateWheelResult() {
+
+    var client_seed = $("#client_seed").val();
+    var last_seed = $("#server_seed").val();
+    var games = $("#games").val();
+
+    var actual_hash;
+    var p1, p2, p3, p4, roll, crash_point;
+
+    $("#tabled > tbody").html("");
+
+    for (x = 0; x <= games; x++) {
+
+        var md = forge.md.sha512.create();
+        md.update(client_seed + "-" + last_seed);
+        actual_hash = md.digest().toHex();
+
+        p1 = parseInt((actual_hash.substr(0, 2) + "").replace(/[^a-f0-9]/gi, ""), 16);
+        p2 = parseInt((actual_hash.substr(2, 2) + "").replace(/[^a-f0-9]/gi, ""), 16);
+        p3 = parseInt((actual_hash.substr(4, 2) + "").replace(/[^a-f0-9]/gi, ""), 16);
+        p4 = parseInt((actual_hash.substr(6, 2) + "").replace(/[^a-f0-9]/gi, ""), 16);
+
+        roll = toFixed((p1 / Math.pow(256, 1) + p2 / Math.pow(256, 2) + p3 / Math.pow(256, 3) + p4 / Math.pow(256, 4)), 12);
+        outcome = toFixed((roll * 53), 0);
+        outcome = wheel_outcomes[outcome];
+
+        $("#tabled > tbody").append("<tr>" + "<td>" + last_seed + "</td>" + "<td>" + outcome + "</td>" + "</tr>");
+
+        var md = forge.md.sha256.create();
+        md.update(last_seed);
+        last_seed = md.digest().toHex();
+
+    }
+
+}
+
 function calculateRouletteResult() {
 
     var client_seed = $("#client_seed").val();
@@ -1063,4 +1101,8 @@ $("#blackjack-calculate-result").click(function (e) {
 
 $("#mines-calculate-result").click(function (e) {
     calculateMinesResult();
+});
+
+$("#wheel-calculate-result").click(function (e) {
+    calculateWheelResult();
 });

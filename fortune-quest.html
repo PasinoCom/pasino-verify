@@ -60,19 +60,19 @@
         <li>Server Seed: This is the server seed of the chain generated in the start for 10,000,000 rounds. The last seed (i.e., first round)'s seed is always public so that you can check that we did not change the server seed in the middle of the games.</li>
     </ul>
 
-    This page allows you to determine the fairness of the mechanism used in our Crash game.
+    This page allows you to determine the fairness of the mechanism used in our Fortune Quest game.
 
     <br>
     <br>
 
     <ul>
         <li>We start by generating 10 M hashes, starting with a server seed which is continuously hashed with SHA-256 till we have 10M hashes.</li>
-        <li>The last hash of the series is <code>b066c23ef601659038ad46860677642de5f8541418002b43ef56c406270e78e9</code>. This is so that you know that we have not changed the chain of our hashes in our favour. By making it public, we prevent ourselves from changing any hashes in the chain.</li>
+        <li>The last hash of the series is <code>172cb498b3df5f017c3763b6685f8b8e972054ab5101075413b1fb9d1ca58b15</code>. This is so that you know that we have not changed the chain of our hashes in our favour. By making it public, we prevent ourselves from changing any hashes in the chain.</li>
         <li>We will play all the hashes in reverse order. Starting from 10M (th) hash to 1st.</li>
-        <li>In order to make sure that we don't choose a server seed in our favour, we use a client seed which comes from a Bitcoin block (711779) from the future. The block number is chosen before it is mined, so we don't have any way to predict its hash. Every 4-5 years (roughly), our hashes will exhaust and we will have another seeding event to generate the new list of hashes and select a new Bitcoin block in the future.</li>
+        <li>In order to make sure that we don't choose a server seed in our favour, we use a client seed which comes from a Bitcoin block (736013) from the future. The block number is chosen before it is mined, so we don't have any way to predict its hash. Every 4-5 years (roughly), our hashes will exhaust and we will have another seeding event to generate the new list of hashes and select a new Bitcoin block in the future.</li>
     </ul>
 
-    The Bitcoin Block is chosen and referenced at a third-party forum such as Bitcoin Talk. The link to our seeding event is as follows: <a href="https://bitcointalk.org/index.php?topic=5373755" target="_blank">https://bitcointalk.org/index.php?topic=5373755</a>
+    The Bitcoin Block is chosen and referenced at a third-party forum such as Bitcoin Talk. The link to our seeding event is as follows: <a href="https://bitcointalk.org/index.php?topic=5398181" target="_blank">https://bitcointalk.org/index.php?topic=5398181</a>
 
     <br>
     <br>
@@ -87,7 +87,7 @@
         <div class="col-xs-12 col-md-6">
             <div class="form-group">
                 <label for="client_seed" class="col-form-label">Client Seed (Bitcoin Block)</label>
-                <input type="text" id="client_seed" class="form-control" value="0000000000000000000273575fdac897ff389aac3e35745220cdae16f7506470" disabled>
+                <input type="text" id="client_seed" class="form-control" value="00000000000000000000193048476f981a835cd00964b50043fb660f771dc2c3" disabled>
                 <small class="form-text text-muted">This Client Seed comes from a Bitcoin Block</small>
             </div>
         </div>
@@ -118,7 +118,7 @@
         <thead>
         <tr>
             <th><span class="bold">Game Hash</span></th>
-            <th><span class="bold">Crash Point</span></th>
+            <th><span class="bold">Outcome</span></th>
         </tr>
         </thead>
         <tbody>
@@ -128,7 +128,7 @@
         </tbody>
     </table>
 
-    <button class="btn btn-primary" id="crash-calculate-result">Calculate Result</button>
+    <button class="btn btn-primary" id="wheel-calculate-result">Calculate Result</button>
 
 </div>
 
