@@ -1170,6 +1170,39 @@ function calculateMinesResult() {
 
 }
 
+function calculateLotteryResult() {
+    
+    var client_seed = $("#client_seed").val();
+    var server_seed = $("#server_seed").val();
+
+    var md = forge.md.sha256.create();
+    md.update(server_seed);
+    var server_seed_hash = md.digest().toHex();
+
+    var game_hash = forge.hmac.create();
+    game_hash.start('sha256', server_seed);
+    game_hash.update(client_seed);
+    game_hash = game_hash.digest().toHex();
+
+    var remainingBalls = Array(36).fill(null).map((v, i) => i+1);
+    var balls = [];
+
+    for (var i=0; i<5; i++) {
+        var random = parseInt(game_hash.substr(i * 8, 8), 16);
+        
+        const index = Math.floor((random / 0x100000000) * remainingBalls.length);
+        console.log(index);
+        balls.push(remainingBalls.splice(index, 1)[0]);
+    }
+
+    const jackpot = Math.floor((parseInt(game_hash.substr(40, 8), 16) / 0x100000000) * 10) + 1;
+
+    $('#winning_numbers').val(balls.join(", "));
+    $('#jackpot_number').val(jackpot);
+    $("#server_seed_hash").val(server_seed_hash);
+    
+}
+
 $("#dice-calculate-result").click(function (e) {
     calculateDiceResult();
 });
@@ -1217,3 +1250,7 @@ $("#wheel-calculate-result").click(function (e) {
 $("#towers-calculate-result").click(function (e) {
     calculateTowersResult();
 });
+
+$("#lottery-calculate-result").click(function (e) {
+    calculateLotteryResult();
+})
