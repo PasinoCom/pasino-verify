@@ -795,7 +795,7 @@ function calculateVideoPokerResult() {
 
     }
 
-    let deck = Array.from(Array(51).keys());
+    let deck = Array.from(Array(52).keys());
     let initial_cards = [];
     let coming_cards = [];
 
@@ -982,113 +982,6 @@ function calculateKenoResult() {
 
 }
 
-function calculateTowersResult() {
-
-    var client_seed = $("#client_seed").val();
-    var server_seed = $("#server_seed").val();
-    var difficulty = $("#difficulty").val();
-    var nonce = $("#nonce").val();
-
-    let columns = 4;
-
-    if (difficulty === "medium" || difficulty === 'wicked') {
-        columns = 3;
-    } else if (difficulty === "hard") {
-        columns = 2;
-    }
-
-    var md = forge.md.sha256.create();
-    md.update(server_seed);
-    var server_seed_hash = md.digest().toHex();
-
-    var matrix_results = [];
-
-    for (x = 0; x < 9; ++x) {
-
-        var seeds = [];
-
-        var md = forge.md.sha256.create();
-        md.update(server_seed);
-        var server_seed_hash = md.digest().toHex();
-
-        var hash = forge.hmac.create();
-        hash.start('sha256', server_seed);
-        hash.update(client_seed + ":" + nonce + ":" + x);
-        hash = hash.digest().toHex();
-
-        let s = 0;
-
-        for (k = 0; k < 32; k++) {
-            s = k * 2;
-            seeds.push(hash.substring(k * 2, s + 2));
-        }
-
-        let num1 = parseFloat(parseInt(seeds[0], 16) / Math.pow(256, 1)).toFixed(12);
-        let num2 = parseFloat(parseInt(seeds[1], 16) / Math.pow(256, 2)).toFixed(12);
-        let num3 = parseFloat(parseInt(seeds[2], 16) / Math.pow(256, 3)).toFixed(12);
-        let num4 = parseFloat(parseInt(seeds[3], 16) / Math.pow(256, 4)).toFixed(12);
-        let sum = toFixed((+num1 + +num2 + +num3 + +num4), 12);
-        let found_location = parseInt(toFixed(sum * columns, 0));
-
-        let results = [];
-        let generated_other_positions = [];
-
-        let good_locations = [];
-        let bad_locations = [];
-
-        for (y = 0; y < columns; y++) {
-
-            if (y === found_location) {
-                continue;
-            }
-
-            generated_other_positions.push(y);
-
-        }
-
-        if (difficulty === 'wicked' || difficulty === 'brutal') {
-            good_locations.push(found_location);
-            bad_locations = generated_other_positions;
-        } else {
-            good_locations = generated_other_positions;
-            bad_locations.push(found_location);
-        }
-
-        matrix_results.push({
-            "good_locations": good_locations,
-            "bad_locations": bad_locations
-        });
-
-    }
-
-    $("#result").html("");
-
-    const reversed = matrix_results.reverse();
-
-    for (i = 0; i < reversed.length; i++) {
-
-        let line = '';
-
-        for (j = 0; j < columns; j++) {
-
-            if (reversed[i]['good_locations'].includes(j)) {
-                line = '<img src="assets/img/towers/fish.svg" width="48" height="48">';
-            } else {
-                line = '<img src="assets/img/towers/vomit.svg" width="48" height="48">';
-            }
-
-            $("#result").html($("#result").html() + line);
-
-        }
-
-        $("#result").html($("#result").html() + "<br />");
-
-    }
-
-    $("#server_seed_hash").val(server_seed_hash);
-
-}
-
 function calculateMinesResult() {
 
     var client_seed = $("#client_seed").val();
@@ -1170,39 +1063,6 @@ function calculateMinesResult() {
 
 }
 
-function calculateLotteryResult() {
-    
-    var client_seed = $("#client_seed").val();
-    var server_seed = $("#server_seed").val();
-
-    var md = forge.md.sha256.create();
-    md.update(server_seed);
-    var server_seed_hash = md.digest().toHex();
-
-    var game_hash = forge.hmac.create();
-    game_hash.start('sha256', server_seed);
-    game_hash.update(client_seed);
-    game_hash = game_hash.digest().toHex();
-
-    var remainingBalls = Array(36).fill(null).map((v, i) => i+1);
-    var balls = [];
-
-    for (var i=0; i<5; i++) {
-        var random = parseInt(game_hash.substr(i * 8, 8), 16);
-        
-        const index = Math.floor((random / 0x100000000) * remainingBalls.length);
-        console.log(index);
-        balls.push(remainingBalls.splice(index, 1)[0]);
-    }
-
-    const jackpot = Math.floor((parseInt(game_hash.substr(40, 8), 16) / 0x100000000) * 10) + 1;
-
-    $('#winning_numbers').val(balls.join(", "));
-    $('#jackpot_number').val(jackpot);
-    $("#server_seed_hash").val(server_seed_hash);
-    
-}
-
 $("#dice-calculate-result").click(function (e) {
     calculateDiceResult();
 });
@@ -1246,11 +1106,3 @@ $("#mines-calculate-result").click(function (e) {
 $("#wheel-calculate-result").click(function (e) {
     calculateWheelResult();
 });
-
-$("#towers-calculate-result").click(function (e) {
-    calculateTowersResult();
-});
-
-$("#lottery-calculate-result").click(function (e) {
-    calculateLotteryResult();
-})
