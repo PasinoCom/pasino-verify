@@ -1063,6 +1063,41 @@ function calculateMinesResult() {
 
 }
 
+function calculateLotteryResult(){
+
+    const client_seed = $("#client_seed").val();
+    const server_seed = $("#server_seed").val();
+
+    const md = forge.md.sha256.create();
+    md.update(server_seed);
+
+    const server_seed_hash = md.digest().toHex();
+
+    const game_hash = forge.hmac.create();
+    game_hash.start("sha256", server_seed);
+    game_hash.update(client_seed);
+    const hash_result = game_hash.digest().toHex();
+
+    const remainingBalls = Array(36)
+    .fill(null)
+    .map((v, i) => i + 1);
+    const balls = [];
+
+    for (let i = 0; i < 5; i++) {
+        const cut = i * 8;
+        const random = parseInt(hash_result.substring(cut, cut + 8), 16);
+
+        const index = Math.floor((random / 0x100000000) * remainingBalls.length);
+        balls.push(remainingBalls.splice(index, 1)[0]);
+    }
+
+    const jackpot = Math.floor((parseInt(hash_result.substring(40, 48), 16) / 0x100000000) * 10) + 1;
+
+    $("#winning_numbers").val(balls);
+    $("#jackpot_number").val(jackpot);
+    $("#server_seed_hash").val(server_seed_hash);
+}
+
 $("#dice-calculate-result").click(function (e) {
     calculateDiceResult();
 });
@@ -1106,3 +1141,9 @@ $("#mines-calculate-result").click(function (e) {
 $("#wheel-calculate-result").click(function (e) {
     calculateWheelResult();
 });
+
+$("#lottery-calculate-result").click(function (e) {
+    calculateLotteryResult();
+});
+
+$("#year").html(new Date().getFullYear());
